@@ -14,12 +14,37 @@ export class StockfishEngineService {
 
   private initializeWorker(): void {
     try {
-      // Load Stockfish from bundled assets with base-href support
-      // Use relative path from document base
+      // Get base href for asset paths
       const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
-      const stockfishPath = `${baseHref}assets/stockfish/stockfish-17.1-lite-51f59da.js`;
+      const stockfishDir = `${baseHref}assets/stockfish/`;
       
-      this.worker = new Worker(stockfishPath);
+      // Create inline worker wrapper that loads Stockfish with correct locateFile
+      const workerCode = `
+        self.importScripts('${stockfishDir}stockfish-17.1-lite-51f59da.js');
+        
+        // Configure Stockfish to find WASM file
+        if (typeof Stockfish !== 'undefined') {
+          const engine = Stockfish({
+            locateFile: function(file) {
+              return '${stockfishDir}' + file;
+            }
+          });
+          
+          // Forward messages between Stockfish and main thread
+          engine.addMessageListener(function(msg) {
+            self.postMessage(msg);
+          });
+          
+          self.onmessage = function(e) {
+            engine.postMessage(e.data);
+          };
+        }
+      `;
+      
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      
+      this.worker = new Worker(workerUrl);
       
       this.worker.onmessage = (event: MessageEvent) => {
         this.messageSubject.next(event.data);
@@ -27,7 +52,7 @@ export class StockfishEngineService {
 
       this.worker.onerror = (error: ErrorEvent) => {
         console.error('Stockfish Worker error:', error);
-        console.error('Failed to load Stockfish from:', stockfishPath);
+        console.error('Stockfish directory:', stockfishDir);
       };
 
       // Initialize UCI protocol
