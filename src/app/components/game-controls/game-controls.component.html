@@ -1,0 +1,11 @@
+<div class="game-controls">
+  <button class="control-button new-game" (click)="onNewGame()">New Game</button>
+  <button class="control-button undo-move" (click)="onUndoMove()">Undo Move</button>
+  <div class="difficulty-selector">
+    <label for="difficulty">Difficulty:</label>
+    <select id="difficulty" [value]="selectedDifficulty" (change)="onDifficultyChange($event)">
+      <option *ngFor="let option of difficultyOptions" [value]="option.value">{{ option.label }}</option>
+    </select>
+  </div>
+</div>
+
