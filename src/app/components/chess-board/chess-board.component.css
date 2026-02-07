@@ -36,6 +36,7 @@
   justify-content: center;
   font-size: 0.8rem;
   color: rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease-out;
 }
 
 .square.light {
@@ -44,6 +45,10 @@
 
 .square.dark {
   background-color: #b58863;
+}
+
+.square.valid-move {
+  background-color: rgba(0, 255, 0, 0.3);
 }
 
 .piece {
@@ -56,6 +61,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.3s ease-out;
 }
 
 .white-piece {

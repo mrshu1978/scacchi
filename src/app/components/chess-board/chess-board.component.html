@@ -3,8 +3,8 @@
     <span *ngFor="let rank of ranks" class="rank-label">{{ rank }}</span>
   </div>
   <div class="board-grid">
-    <div *ngFor="let square of squares" class="square" [class.light]="square.color === 'light'" [class.dark]="square.color === 'dark'" [attr.data-coordinate]="square.coordinate">
-      <span *ngIf="square.piece" class="piece" [class.white-piece]="isWhitePiece(square.piece)" [class.black-piece]="!isWhitePiece(square.piece)">
+    <div *ngFor="let square of squares" class="square" [class.light]="square.color === 'light'" [class.dark]="square.color === 'dark'" [class.valid-move]="square.validMove" [attr.data-coordinate]="square.coordinate" draggable="true" (dragstart)="onDragStart($event, square)" (dragover)="onDragOver($event)" (drop)="onDrop($event, square)">
+      <span *ngIf="square.piece" class="piece" [class.white-piece]="isWhitePiece(square.piece)" [class.black-piece]="!isWhitePiece(square.piece)" draggable="true">
         {{ getPieceUnicode(square.piece) }}
       </span>
     </div>
