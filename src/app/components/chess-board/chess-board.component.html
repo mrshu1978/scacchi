@@ -1,0 +1,14 @@
+<div class="chess-board">
+  <div class="rank-labels">
+    <span *ngFor="let rank of ranks" class="rank-label">{{ rank }}</span>
+  </div>
+  <div class="board-grid">
+    <div *ngFor="let square of squares" class="square" [class.light]="square.color === 'light'" [class.dark]="square.color === 'dark'" [attr.data-coordinate]="square.coordinate">
+      {{ square.coordinate }}
+    </div>
+  </div>
+  <div class="file-labels">
+    <span *ngFor="let file of files" class="file-label">{{ file }}</span>
+  </div>
+</div>
+
