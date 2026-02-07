@@ -1,0 +1,16 @@
+<div class="game-info">
+  <h2>Game Info</h2>
+  <div class="turn-indicator">
+    <span>Current Turn: </span>
+    <span [class.white-turn]="currentTurn === 'white'" [class.black-turn]="currentTurn === 'black'">
+      {{ currentTurn === 'white' ? 'White' : 'Black' }}
+    </span>
+  </div>
+  <div class="move-history">
+    <h3>Last 5 Moves</h3>
+    <ul>
+      <li *ngFor="let move of moveHistory">{{ move }}</li>
+    </ul>
+  </div>
+</div>
+
