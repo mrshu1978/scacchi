@@ -15,9 +15,17 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "tsconfig.json",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.css"],
-            "scripts": []
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
+            "scripts": [],
+            "polyfills": [
+              "zone.js"
+            ]
           }
         },
         "serve": {
