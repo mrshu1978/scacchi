@@ -14,8 +14,12 @@ export class StockfishEngineService {
 
   private initializeWorker(): void {
     try {
-      // Load Stockfish from bundled assets (copied from node_modules during build)
-      this.worker = new Worker('/assets/stockfish/stockfish-17.1-lite-51f59da.js');
+      // Load Stockfish from bundled assets with base-href support
+      // Use relative path from document base
+      const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
+      const stockfishPath = `${baseHref}assets/stockfish/stockfish-17.1-lite-51f59da.js`;
+      
+      this.worker = new Worker(stockfishPath);
       
       this.worker.onmessage = (event: MessageEvent) => {
         this.messageSubject.next(event.data);
@@ -23,6 +27,7 @@ export class StockfishEngineService {
 
       this.worker.onerror = (error: ErrorEvent) => {
         console.error('Stockfish Worker error:', error);
+        console.error('Failed to load Stockfish from:', stockfishPath);
       };
 
       // Initialize UCI protocol
