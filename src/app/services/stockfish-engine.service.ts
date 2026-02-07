@@ -9,6 +9,7 @@ export class StockfishEngineService {
   private isInitialized: boolean = false;
   private resolveInit: (() => void) | null = null;
   private resolveBestMove: ((move: string) => void) | null = null;
+  private isAvailable: boolean = false;
 
   constructor() {
     this.initializeEngine();
@@ -16,11 +17,18 @@ export class StockfishEngineService {
 
   private initializeEngine(): void {
     if (typeof Worker !== 'undefined') {
-      this.worker = new Worker('https://cdn.jsdelivr.net/npm/stockfish.js/stockfish.js');
-      this.worker.onmessage = (event) => this.handleMessage(event);
-      this.worker.postMessage('uci');
+      try {
+        // Temporarily disabled due to GitHub Pages CORS restrictions
+        // this.worker = new Worker('https://cdn.jsdelivr.net/npm/stockfish.js/stockfish.js');
+        console.warn('Stockfish AI engine disabled on GitHub Pages (CORS restrictions). Human vs Human mode only.');
+        this.isAvailable = false;
+      } catch (error) {
+        console.error('Failed to initialize Stockfish engine:', error);
+        this.isAvailable = false;
+      }
     } else {
       console.error('Web Workers are not supported in this environment.');
+      this.isAvailable = false;
     }
   }
 
@@ -28,6 +36,7 @@ export class StockfishEngineService {
     const message = event.data;
     if (message.includes('uciok')) {
       this.isInitialized = true;
+      this.isAvailable = true;
       this.setSkillLevel(this.skillLevel);
       if (this.resolveInit) {
         this.resolveInit();
@@ -60,10 +69,14 @@ export class StockfishEngineService {
     }
   }
 
+  public isEngineAvailable(): boolean {
+    return this.isAvailable;
+  }
+
   public getBestMove(fen: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      if (!this.worker) {
-        reject(new Error('Stockfish engine not available.'));
+      if (!this.isAvailable || !this.worker) {
+        reject(new Error('Stockfish engine not available (disabled on GitHub Pages due to CORS).'));
         return;
       }
 
@@ -81,4 +94,3 @@ export class StockfishEngineService {
     });
   }
 }
-
