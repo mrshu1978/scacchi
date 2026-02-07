@@ -4,7 +4,9 @@
   </div>
   <div class="board-grid">
     <div *ngFor="let square of squares" class="square" [class.light]="square.color === 'light'" [class.dark]="square.color === 'dark'" [attr.data-coordinate]="square.coordinate">
-      {{ square.coordinate }}
+      <span *ngIf="square.piece" class="piece" [class.white-piece]="isWhitePiece(square.piece)" [class.black-piece]="!isWhitePiece(square.piece)">
+        {{ getPieceUnicode(square.piece) }}
+      </span>
     </div>
   </div>
   <div class="file-labels">
