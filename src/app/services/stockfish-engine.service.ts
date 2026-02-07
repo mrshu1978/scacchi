@@ -14,8 +14,8 @@ export class StockfishEngineService {
 
   private initializeWorker(): void {
     try {
-      // Load Stockfish from node_modules (bundled locally)
-      this.worker = new Worker(new URL('../../../node_modules/stockfish/src/stockfish-17.1-lite-51f59da.js', import.meta.url), { type: 'module' });
+      // Load Stockfish from bundled assets (copied from node_modules during build)
+      this.worker = new Worker('/assets/stockfish/stockfish-17.1-lite-51f59da.js');
       
       this.worker.onmessage = (event: MessageEvent) => {
         this.messageSubject.next(event.data);

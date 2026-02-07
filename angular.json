@@ -35,6 +35,21 @@
           }
         }
       }
+    },
+    "scacchi-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "node_modules/stockfish/src",
+                "output": "/assets/stockfish"
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }
