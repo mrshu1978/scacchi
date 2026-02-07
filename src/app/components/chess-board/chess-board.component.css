@@ -1,3 +1,4 @@
+/* Chess board component styles with card layout and animations */
 .chess-board {
   display: flex;
   flex-direction: column;
@@ -5,6 +6,11 @@
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  animation: slideIn 0.5s ease-out;
 }
 
 .rank-labels {
@@ -28,6 +34,8 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .square {
@@ -36,7 +44,7 @@
   justify-content: center;
   font-size: 0.8rem;
   color: rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease-out, background-color 0.3s ease;
 }
 
 .square.light {
@@ -51,6 +59,11 @@
   background-color: rgba(0, 255, 0, 0.3);
 }
 
+.square:hover {
+  transform: scale(1.05);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
 .piece {
   font-size: 3em;
   text-align: center;
@@ -62,6 +75,12 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.3s ease-out;
+  animation: slideIn 0.3s ease-out;
+}
+
+.piece:hover {
+  transform: scale(1.1);
+  cursor: grab;
 }
 
 .white-piece {
@@ -90,7 +109,8 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .chess-board {
-    max-width: 95%;
+    max-width: 90vw;
+    padding: 15px;
   }
   .square {
     font-size: 0.6rem;
@@ -100,3 +120,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .chess-board {
+    max-width: 95vw;
+    padding: 10px;
+  }
+  .piece {
+    font-size: 1.5em;
+  }
+}

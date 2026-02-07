@@ -1,3 +1,4 @@
+/* Game controls component styles with hover effects and responsive design */
 .game-controls {
   display: flex;
   flex-wrap: wrap;
@@ -5,27 +6,30 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.5s ease-out;
 }
 
 .control-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 1rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  font-weight: bold;
 }
 
 .control-button:hover {
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .control-button:active {
-  transform: translateY(0);
+  transform: scale(1);
 }
 
 .new-game {
@@ -58,18 +62,24 @@
 }
 
 .difficulty-selector select {
-  padding: 8px 12px;
+  padding: 10px 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
   background-color: white;
   font-size: 1rem;
   cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.difficulty-selector select:hover {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .difficulty-selector select:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
 }
 
 /* Responsive adjustments */
@@ -77,6 +87,7 @@
   .game-controls {
     flex-direction: column;
     align-items: stretch;
+    padding: 15px;
   }
   .control-button, .difficulty-selector {
     width: 100%;
@@ -86,3 +97,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .game-controls {
+    padding: 10px;
+  }
+  .control-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,82 @@
+/* Global styles for the chess game */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 100vh;
+  color: #fff;
+}
+
+/* Keyframes for piece movement animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Overall layout using CSS Grid */
+.app-container {
+  display: grid;
+  grid-template-areas:
+    'header'
+    'controls'
+    'board'
+    'info';
+  grid-template-rows: auto auto auto auto;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  grid-area: header;
+  text-align: center;
+  font-size: 2.5rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+app-game-controls {
+  grid-area: controls;
+}
+
+app-chess-board {
+  grid-area: board;
+}
+
+app-game-info {
+  grid-area: info;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .app-container {
+    grid-template-areas:
+      'header header'
+      'board controls'
+      'board info';
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-container {
+    grid-template-areas:
+      'header'
+      'controls'
+      'board'
+      'info';
+    grid-template-rows: auto auto auto auto;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+}
