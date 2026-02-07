@@ -1,33 +1,29 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Piece, BoardMatrix, STARTING_FEN } from '../models/chess.models';
+import { BehaviorSubject } from 'rxjs';
 import { StockfishEngineService } from './stockfish-engine.service';
+import { BoardMatrix, STARTING_FEN } from '../models/chess.models';
 
 export interface GameState {
-  board: BoardMatrix;
-  currentPlayer: 'white' | 'black';
-  isGameOver: boolean;
-  winner: 'white' | 'black' | 'draw' | null;
-  fen: string;
+  board: (string | null)[][];
+  turn: 'white' | 'black';
+  history: string[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChessGameService {
-  private gameStateSubject = new BehaviorSubject<GameState>(this.getInitialState());
-  public gameState$: Observable<GameState> = this.gameStateSubject.asObservable();
+  private boardSubject = new BehaviorSubject<BoardMatrix>(this.parseFEN(STARTING_FEN));
+  private turnSubject = new BehaviorSubject<'white' | 'black'>('white');
+  private historySubject = new BehaviorSubject<string[]>([]);
+  private stockfishDepth: number = 10; // Stockfish search depth (1-20)
 
-  constructor(private stockfishEngine: StockfishEngineService) {}
+  board$ = this.boardSubject.asObservable();
+  turn$ = this.turnSubject.asObservable();
+  history$ = this.historySubject.asObservable();
 
-  private getInitialState(): GameState {
-    return {
-      board: this.parseFEN(STARTING_FEN),
-      currentPlayer: 'white',
-      isGameOver: false,
-      winner: null,
-      fen: STARTING_FEN
-    };
+  constructor(private stockfish: StockfishEngineService) {
+    this.loadGameState();
   }
 
   parseFEN(fen: string): BoardMatrix {
@@ -58,78 +54,94 @@ export class ChessGameService {
     return board;
   }
 
-  newGame(): void {
-    this.gameStateSubject.next(this.getInitialState());
-    this.stockfishEngine.sendCommand('ucinewgame');
-  }
-
-  movePiece(fromRow: number, fromCol: number, toRow: number, toCol: number): boolean {
-    const currentState = this.gameStateSubject.value;
-
-    if (currentState.isGameOver) {
-      return false;
-    }
-
-    const piece = currentState.board[fromRow][fromCol];
-    if (!piece) {
-      return false;
-    }
-
-    const pieceColor = piece === piece.toLowerCase() ? 'black' : 'white';
-    if (pieceColor !== currentState.currentPlayer) {
-      return false;
-    }
-
-    // Update board
-    const newBoard = currentState.board.map(row => [...row]);
-    newBoard[toRow][toCol] = newBoard[fromRow][fromCol];
-    newBoard[fromRow][fromCol] = null;
-
-    // Generate new FEN (simplified - doesn't handle castling/en passant flags)
-    const newFEN = this.boardToFEN(newBoard, currentState.currentPlayer === 'white' ? 'black' : 'white');
-
-    // Check for game over (simplified - just checks if kings are present)
-    const hasWhiteKing = newBoard.flat().some(p => p === 'K');
-    const hasBlackKing = newBoard.flat().some(p => p === 'k');
-    const isGameOver = !hasWhiteKing || !hasBlackKing;
-    const winner = !hasWhiteKing ? 'black' : !hasBlackKing ? 'white' : null;
-
-    this.gameStateSubject.next({
-      board: newBoard,
-      currentPlayer: currentState.currentPlayer === 'white' ? 'black' : 'white',
-      isGameOver,
-      winner,
-      fen: newFEN
-    });
-
-    // If it's AI's turn, request move from Stockfish
-    if (!isGameOver && this.gameStateSubject.value.currentPlayer === 'black') {
-      this.requestAIMove();
-    }
-
-    return true;
-  }
-
-  private requestAIMove(): void {
-    const currentState = this.gameStateSubject.value;
+  makeMove(from: string, to: string): void {
+    const board = this.boardSubject.getValue();
+    const fromRow = 8 - parseInt(from[1]);
+    const fromCol = from.charCodeAt(0) - 97;
+    const toRow = 8 - parseInt(to[1]);
+    const toCol = to.charCodeAt(0) - 97;
+    const piece = board[fromRow][fromCol];
     
-    this.stockfishEngine.getBestMove(currentState.fen, 10).subscribe(move => {
-      if (move && move.length >= 4) {
-        const fromCol = move.charCodeAt(0) - 97; // 'a' = 0
-        const fromRow = 8 - parseInt(move[1]);
-        const toCol = move.charCodeAt(2) - 97;
-        const toRow = 8 - parseInt(move[3]);
-
-        setTimeout(() => {
-          this.movePiece(fromRow, fromCol, toRow, toCol);
-        }, 500);
-      }
-    });
+    if (piece) {
+      const newBoard = board.map(row => [...row]);
+      newBoard[fromRow][fromCol] = null;
+      newBoard[toRow][toCol] = piece;
+      this.boardSubject.next(newBoard);
+      
+      const moveNotation = `${from}-${to}`;
+      const history = this.historySubject.getValue();
+      this.historySubject.next([...history, moveNotation]);
+      
+      this.toggleTurn();
+      this.saveGameState();
+      
+      // Execute AI move after short delay
+      setTimeout(() => this.executeAIMoveIfNeeded(), 500);
+    }
   }
 
-  private boardToFEN(board: BoardMatrix, nextPlayer: 'white' | 'black'): string {
-    let fen = '';
+  getValidMoves(from: string): string[] {
+    // Simplified: allow all moves for now
+    // In a full implementation, would use chess rules validation
+    const board = this.boardSubject.getValue();
+    const fromRow = 8 - parseInt(from[1]);
+    const fromCol = from.charCodeAt(0) - 97;
+    const piece = board[fromRow][fromCol];
+    
+    if (!piece) return [];
+    
+    const isWhite = piece === piece.toUpperCase();
+    const currentTurn = this.turnSubject.getValue();
+    
+    // Can only move pieces of current turn color
+    if ((isWhite && currentTurn !== 'white') || (!isWhite && currentTurn !== 'black')) {
+      return [];
+    }
 
+    // Return all empty squares and opponent pieces as valid moves
+    const validMoves: string[] = [];
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const targetPiece = board[row][col];
+        if (targetPiece === null || (targetPiece === targetPiece.toUpperCase()) !== isWhite) {
+          const targetSquare = String.fromCharCode(97 + col) + (8 - row);
+          validMoves.push(targetSquare);
+        }
+      }
+    }
+
+    return validMoves;
+  }
+
+  getCurrentPosition(): BoardMatrix {
+    return this.boardSubject.getValue();
+  }
+
+  private toggleTurn(): void {
+    const currentTurn = this.turnSubject.getValue();
+    this.turnSubject.next(currentTurn === 'white' ? 'black' : 'white');
+  }
+
+  private executeAIMoveIfNeeded(): void {
+    const currentTurn = this.turnSubject.getValue();
+    if (currentTurn === 'black') {
+      const fen = this.boardToFEN(this.boardSubject.getValue());
+      
+      this.stockfish.getBestMove(fen, this.stockfishDepth).subscribe(move => {
+        if (move && move.length >= 4) {
+          const from = move.substring(0, 2);
+          const to = move.substring(2, 4);
+          console.log(`Stockfish AI move: ${from} -> ${to}`);
+          this.makeMove(from, to);
+        } else {
+          console.warn('Stockfish could not find a valid move');
+        }
+      });
+    }
+  }
+
+  private boardToFEN(board: (string | null)[][]): string {
+    let fen = '';
     for (let row = 0; row < 8; row++) {
       let emptyCount = 0;
       for (let col = 0; col < 8; col++) {
@@ -138,25 +150,70 @@ export class ChessGameService {
           emptyCount++;
         } else {
           if (emptyCount > 0) {
-            fen += emptyCount;
+            fen += emptyCount.toString();
             emptyCount = 0;
           }
           fen += piece;
         }
       }
       if (emptyCount > 0) {
-        fen += emptyCount;
+        fen += emptyCount.toString();
       }
       if (row < 7) {
         fen += '/';
       }
     }
-
-    fen += ` ${nextPlayer === 'white' ? 'w' : 'b'} KQkq - 0 1`;
-    return fen;
+    const turn = this.turnSubject.getValue();
+    return `${fen} ${turn === 'white' ? 'w' : 'b'} KQkq - 0 1`;
   }
 
-  getGameState(): GameState {
-    return this.gameStateSubject.value;
+  private saveGameState(): void {
+    const state: GameState = {
+      board: this.boardSubject.getValue(),
+      turn: this.turnSubject.getValue(),
+      history: this.historySubject.getValue()
+    };
+    sessionStorage.setItem('chessGameState', JSON.stringify(state));
+  }
+
+  private loadGameState(): void {
+    const saved = sessionStorage.getItem('chessGameState');
+    if (saved) {
+      const state: GameState = JSON.parse(saved);
+      this.boardSubject.next(state.board);
+      this.turnSubject.next(state.turn);
+      this.historySubject.next(state.history);
+    }
+  }
+
+  resetGame(): void {
+    const initialBoard = this.parseFEN(STARTING_FEN);
+    this.boardSubject.next(initialBoard);
+    this.turnSubject.next('white');
+    this.historySubject.next([]);
+    sessionStorage.clear();
+    this.stockfish.sendCommand('ucinewgame');
+  }
+
+  undoMove(): void {
+    const history = this.historySubject.getValue();
+    if (history.length >= 2) {
+      const newHistory = history.slice(0, -2); // Undo last 2 moves (human + AI)
+      this.historySubject.next(newHistory);
+      this.resetGame();
+      newHistory.forEach(move => {
+        const [from, to] = move.split('-');
+        this.makeMove(from, to);
+      });
+    } else if (history.length === 1) {
+      this.historySubject.next([]);
+      this.resetGame();
+    }
+  }
+
+  setDifficulty(level: number): void {
+    // Map 0-20 level slider directly to Stockfish depth
+    this.stockfishDepth = Math.max(1, Math.min(20, level));
+    console.log(`Stockfish difficulty set to depth ${this.stockfishDepth}`);
   }
 }
