@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { StockfishEngineService } from './stockfish-engine.service';
+import { SimpleChessAI } from './simple-chess-ai.service';
 import { BoardMatrix, STARTING_FEN } from '../models/chess.models';
 
 export interface GameState {
@@ -16,12 +16,13 @@ export class ChessGameService {
   private boardSubject = new BehaviorSubject<BoardMatrix>(this.parseFEN(STARTING_FEN));
   private turnSubject = new BehaviorSubject<'white' | 'black'>('white');
   private historySubject = new BehaviorSubject<string[]>([]);
+  private aiDifficulty: number = 2; // depth for minimax (1=easy, 2=medium, 3=hard)
 
   board$ = this.boardSubject.asObservable();
   turn$ = this.turnSubject.asObservable();
   history$ = this.historySubject.asObservable();
 
-  constructor(private stockfishEngine: StockfishEngineService) {
+  constructor(private simpleAI: SimpleChessAI) {
     this.loadGameState();
   }
 
@@ -60,40 +61,52 @@ export class ChessGameService {
     const toRow = 8 - parseInt(to[1]);
     const toCol = to.charCodeAt(0) - 97;
     const piece = board[fromRow][fromCol];
+    
     if (piece && this.isValidMove(from, to, piece)) {
       const newBoard = board.map(row => [...row]);
       newBoard[fromRow][fromCol] = null;
       newBoard[toRow][toCol] = piece;
       this.boardSubject.next(newBoard);
+      
       const moveNotation = `${from}-${to}`;
       const history = this.historySubject.getValue();
       this.historySubject.next([...history, moveNotation]);
+      
       this.toggleTurn();
       this.saveGameState();
-      this.executeAIMoveIfNeeded();
+      
+      // Execute AI move after short delay
+      setTimeout(() => this.executeAIMoveIfNeeded(), 500);
     }
   }
 
   getValidMoves(from: string): string[] {
-    const moves: string[] = [];
     const board = this.boardSubject.getValue();
     const fromRow = 8 - parseInt(from[1]);
     const fromCol = from.charCodeAt(0) - 97;
     const piece = board[fromRow][fromCol];
-    if (!piece) return moves;
+    
+    if (!piece) return [];
+    
     const isWhite = piece === piece.toUpperCase();
     const currentTurn = this.turnSubject.getValue();
+    
+    // Can only move pieces of current turn color
     if ((isWhite && currentTurn !== 'white') || (!isWhite && currentTurn !== 'black')) {
-      return moves;
+      return [];
     }
-    if (piece.toLowerCase() === 'p') {
-      const direction = isWhite ? -1 : 1;
-      const newRow = fromRow + direction;
-      if (newRow >= 0 && newRow < 8 && !board[newRow][fromCol]) {
-        moves.push(String.fromCharCode(97 + fromCol) + (8 - newRow));
-      }
-    }
-    return moves;
+
+    // Use SimpleChessAI to get all valid moves for this piece
+    const allMoves = this.simpleAI.getAllValidMoves(board, currentTurn);
+    const pieceMoves = allMoves.filter(move => 
+      move.from.row === fromRow && move.from.col === fromCol
+    );
+
+    return pieceMoves.map(move => {
+      const col = String.fromCharCode(97 + move.to.col);
+      const row = 8 - move.to.row;
+      return `${col}${row}`;
+    });
   }
 
   getCurrentPosition(): BoardMatrix {
@@ -114,14 +127,16 @@ export class ChessGameService {
     const currentTurn = this.turnSubject.getValue();
     if (currentTurn === 'black') {
       const board = this.boardSubject.getValue();
-      const fen = this.boardToFEN(board);
-      this.stockfishEngine.getBestMove(fen).then(bestMove => {
-        if (bestMove && bestMove.length >= 4) {
-          const from = bestMove.substring(0, 2);
-          const to = bestMove.substring(2, 4);
-          this.makeMove(from, to);
-        }
-      }).catch(err => console.error('AI move error:', err));
+      const bestMove = this.simpleAI.getBestMove(board, 'black', this.aiDifficulty);
+      
+      if (bestMove && bestMove.length >= 4) {
+        const from = bestMove.substring(0, 2);
+        const to = bestMove.substring(2, 4);
+        console.log(`AI move: ${from} -> ${to}`);
+        this.makeMove(from, to);
+      } else {
+        console.warn('AI could not find a valid move');
+      }
     }
   }
 
@@ -182,7 +197,7 @@ export class ChessGameService {
   undoMove(): void {
     const history = this.historySubject.getValue();
     if (history.length >= 2) {
-      const newHistory = history.slice(0, -2);
+      const newHistory = history.slice(0, -2); // Undo last 2 moves (human + AI)
       this.historySubject.next(newHistory);
       this.resetGame();
       newHistory.forEach(move => {
@@ -196,6 +211,14 @@ export class ChessGameService {
   }
 
   setDifficulty(level: number): void {
-    this.stockfishEngine.setDifficulty(level);
+    // Map 0-20 Stockfish levels to 1-3 minimax depth
+    if (level <= 5) {
+      this.aiDifficulty = 1; // Easy
+    } else if (level <= 15) {
+      this.aiDifficulty = 2; // Medium
+    } else {
+      this.aiDifficulty = 3; // Hard
+    }
+    console.log(`AI difficulty set to depth ${this.aiDifficulty} (level ${level})`);
   }
 }
