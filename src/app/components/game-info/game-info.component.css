@@ -7,8 +7,9 @@
   border: 1px solid var(--axiom-border);
   border-radius: 16px;
   box-shadow: var(--shadow-md);
-  width: 300px;
-  min-width: 300px;
+  width: 320px;
+  min-width: 320px;
+  max-width: 320px;
   flex-shrink: 0;
   animation: slideIn var(--duration-slow) var(--ease-smooth);
 }
