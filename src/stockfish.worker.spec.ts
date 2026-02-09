@@ -12,7 +12,7 @@ describe('Stockfish Worker Logic', () => {
 
   beforeEach(() => {
     messages = [];
-    global.self = { postMessage: mockPostMessage } as any;
+    (globalThis as any).self = { postMessage: mockPostMessage };
 
     // Simulate the SimpleStockfish class from worker
     class SimpleStockfish {

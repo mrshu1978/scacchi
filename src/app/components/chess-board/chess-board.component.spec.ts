@@ -21,15 +21,15 @@ describe('ChessBoardComponent', () => {
   });
 
   it('should initialize board with 64 squares', () => {
-    expect(component.board.length).toBe(64);
+    expect(component.squares.length).toBe(64);
   });
 
   it('should have correct starting position', () => {
     // White pieces
-    expect(component.board[0].piece).toBe('r'); // a8 - black rook
-    expect(component.board[56].piece).toBe('R'); // a1 - white rook
-    expect(component.board[60].piece).toBe('K'); // e1 - white king
-    expect(component.board[4].piece).toBe('k'); // e8 - black king
+    expect(component.squares[0].piece).toBe('r'); // a8 - black rook
+    expect(component.squares[56].piece).toBe('R'); // a1 - white rook
+    expect(component.squares[60].piece).toBe('K'); // e1 - white king
+    expect(component.squares[4].piece).toBe('k'); // e8 - black king
   });
 
   it('should generate correct rank labels', () => {
@@ -64,21 +64,21 @@ describe('ChessBoardComponent', () => {
 
   it('should have correct square colors', () => {
     // a8 (index 0) should be dark
-    expect(component.board[0].color).toBe('dark');
+    expect(component.squares[0].color).toBe('dark');
     // b8 (index 1) should be light
-    expect(component.board[1].color).toBe('light');
+    expect(component.squares[1].color).toBe('light');
     // a1 (index 56) should be light
-    expect(component.board[56].color).toBe('light');
+    expect(component.squares[56].color).toBe('light');
     // h1 (index 63) should be dark
-    expect(component.board[63].color).toBe('dark');
+    expect(component.squares[63].color).toBe('dark');
   });
 
   it('should convert index to algebraic notation', () => {
     // Testing internal logic - these would be private methods
     // Just verify board setup is correct based on algebraic positions
-    const a8 = component.board[0];
-    const h1 = component.board[63];
-    const e4 = component.board[28]; // Middle of board
+    const a8 = component.squares[0];
+    const h1 = component.squares[63];
+    const e4 = component.squares[28]; // Middle of board
 
     expect(a8.piece).toBe('r'); // Black rook at a8
     expect(h1.piece).toBe('R'); // White rook at h1
