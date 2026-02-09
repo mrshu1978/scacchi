@@ -1,43 +1,208 @@
+/* App Container - Main Layout */
 .app-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
 }
 
-h1 {
-  margin-bottom: 20px;
-  font-size: 2.5rem;
-  text-align: center;
+/* Header Styles */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--axiom-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--axiom-border);
+  box-shadow: var(--shadow-md);
+  animation: slideIn var(--duration-base) var(--ease-smooth);
 }
 
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 8px var(--axiom-accent));
+  animation: glow 3s ease-in-out infinite;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--axiom-accent), var(--axiom-accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--axiom-text-primary);
+  text-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+}
+
+/* Main Container */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) var(--space-4);
+  gap: var(--space-6);
+  animation: fadeIn var(--duration-slow) var(--ease-smooth);
+}
+
+/* Game Layout */
 .game-layout {
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: var(--space-8);
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   align-items: flex-start;
 }
 
-/* Responsive adjustments */
+/* Footer Styles */
+.app-footer {
+  background: var(--axiom-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--axiom-border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--axiom-text-secondary);
+}
+
+.footer-content strong {
+  color: var(--axiom-accent);
+  font-weight: 600;
+}
+
+.footer-links {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.footer-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--axiom-surface);
+  border: 1px solid var(--axiom-border);
+  color: var(--axiom-text-primary);
+  transition: all var(--duration-base) var(--ease-smooth);
+}
+
+.footer-links a:hover {
+  background: var(--axiom-accent);
+  border-color: var(--axiom-accent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.footer-links a svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 968px) {
   .game-layout {
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: var(--space-6);
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .app-title {
+    font-size: 1.75rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
   }
 }
 
 @media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
+  .header-content {
+    padding: var(--space-3) var(--space-4);
   }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .logo-text {
+    font-size: 1.25rem;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
   .game-layout {
     max-width: 95%;
+  }
+
+  .main-container {
+    padding: var(--space-4) var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.25rem;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .footer-content p {
+    font-size: 0.8rem;
   }
 }

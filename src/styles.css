@@ -1,14 +1,88 @@
-/* Global styles for the chess game */
+/* Axiom Forge Design System - Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* CSS Custom Properties - Design Tokens */
+:root {
+  /* Colors - Axiom Forge Palette */
+  --axiom-primary: #2c5f9e;
+  --axiom-primary-dark: #1e3c72;
+  --axiom-primary-light: #4a7fc1;
+  --axiom-accent: #00d4ff;
+  --axiom-accent-secondary: #9945ff;
+  --axiom-background: #0a0e27;
+  --axiom-surface: rgba(255, 255, 255, 0.05);
+
+  /* Text Colors */
+  --axiom-text-primary: #ffffff;
+  --axiom-text-secondary: #b0b8c8;
+  --axiom-border: rgba(255, 255, 255, 0.1);
+
+  /* Chess Board Colors */
+  --chess-light: #f0d9b5;
+  --chess-dark: #b58863;
+  --chess-highlight: rgba(0, 212, 255, 0.3);
+
+  /* Typography */
+  --font-primary: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  /* Spacing (8px grid) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2), 0 0 32px rgba(0, 212, 255, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 48px rgba(153, 69, 255, 0.15);
+  --shadow-glow: 0 0 24px rgba(0, 212, 255, 0.4);
+
+  /* Animations */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+}
+
+/* Global Reset & Base Styles */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  font-family: var(--font-primary);
+  background: linear-gradient(135deg, var(--axiom-background) 0%, var(--axiom-primary-dark) 50%, var(--axiom-primary) 100%);
+  background-attachment: fixed;
   min-height: 100vh;
-  color: #fff;
+  color: var(--axiom-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Keyframes for piece movement animations */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 0;
+}
+
+/* Utility Classes */
+.glassmorphism {
+  background: var(--axiom-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--axiom-border);
+}
+
+/* Keyframes */
 @keyframes slideIn {
   from {
     transform: translateY(-20px);
@@ -17,5 +91,43 @@ body {
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--axiom-accent), 0 0 40px var(--axiom-accent);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--axiom-accent), 0 0 60px var(--axiom-accent);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }

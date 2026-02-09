@@ -1,85 +1,121 @@
-/* Game controls component styles with hover effects and responsive design */
+/* Game controls with glassmorphism and gradient buttons */
 .game-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: var(--space-4);
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  background-color: #fff;
+  padding: var(--space-6);
+  background: var(--axiom-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--axiom-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin-bottom: 20px;
-  animation: slideIn 0.5s ease-out;
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-6);
+  animation: slideIn var(--duration-slow) var(--ease-smooth);
 }
 
 .control-button {
-  padding: 12px 24px;
+  padding: 12px 28px;
   font-size: 1rem;
+  font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  font-weight: bold;
+  transition: all var(--duration-base) var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.control-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width var(--duration-slow) var(--ease-smooth),
+              height var(--duration-slow) var(--ease-smooth);
+}
+
+.control-button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .control-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-glow);
 }
 
 .control-button:active {
-  transform: scale(1);
+  transform: translateY(0) scale(0.98);
 }
 
 .new-game {
-  background-color: #4caf50;
+  background: linear-gradient(135deg, var(--axiom-accent), var(--axiom-primary));
   color: white;
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
 }
 
 .new-game:hover {
-  background-color: #45a049;
+  box-shadow: 0 6px 24px rgba(0, 212, 255, 0.5);
 }
 
 .undo-move {
-  background-color: #ff9800;
+  background: linear-gradient(135deg, var(--axiom-accent-secondary), #ff6b9d);
   color: white;
+  box-shadow: 0 4px 16px rgba(153, 69, 255, 0.3);
 }
 
 .undo-move:hover {
-  background-color: #e68900;
+  box-shadow: 0 6px 24px rgba(153, 69, 255, 0.5);
 }
 
 .difficulty-selector {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .difficulty-selector label {
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: var(--axiom-text-primary);
+  font-size: 1rem;
 }
 
 .difficulty-selector select {
-  padding: 10px 15px;
-  border: 1px solid #ccc;
+  padding: 10px 20px;
+  border: 1px solid var(--axiom-border);
   border-radius: 8px;
-  background-color: white;
+  background: var(--axiom-surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--axiom-text-primary);
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all var(--duration-base) var(--ease-smooth);
 }
 
 .difficulty-selector select:hover {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
 }
 
 .difficulty-selector select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+  border-color: var(--axiom-accent);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.5);
+}
+
+.difficulty-selector select option {
+  background: var(--axiom-background);
+  color: var(--axiom-text-primary);
 }
 
 /* Responsive adjustments */
@@ -87,7 +123,7 @@
   .game-controls {
     flex-direction: column;
     align-items: stretch;
-    padding: 15px;
+    padding: var(--space-4);
   }
   .control-button, .difficulty-selector {
     width: 100%;
@@ -99,10 +135,14 @@
 
 @media (max-width: 480px) {
   .game-controls {
-    padding: 10px;
+    padding: var(--space-3);
   }
   .control-button {
     padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  .difficulty-selector label,
+  .difficulty-selector select {
     font-size: 0.9rem;
   }
 }

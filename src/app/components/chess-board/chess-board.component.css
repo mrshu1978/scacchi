@@ -1,4 +1,4 @@
-/* Chess board component styles with card layout and animations */
+/* Chess board component styles with glassmorphism and glow effects */
 .chess-board {
   display: flex;
   flex-direction: column;
@@ -6,25 +6,29 @@
   width: 100%;
   max-width: 700px;
   margin: 0 auto;
-  background: #fff;
+  background: var(--axiom-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--axiom-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  animation: slideIn 0.5s ease-out;
+  box-shadow: var(--shadow-lg), 0 0 48px rgba(0, 212, 255, 0.2);
+  padding: var(--space-6);
+  animation: slideIn var(--duration-slow) var(--ease-smooth);
 }
 
 .rank-labels {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: var(--space-2);
 }
 
 .rank-label {
   text-align: center;
-  font-weight: bold;
-  color: #333;
-  padding: 5px;
+  font-weight: 600;
+  color: var(--axiom-text-primary);
+  padding: var(--space-2);
+  font-size: 0.9rem;
 }
 
 .board-grid {
@@ -33,9 +37,10 @@
   grid-template-rows: repeat(8, 1fr);
   width: 100%;
   aspect-ratio: 1 / 1;
-  border: 2px solid #333;
+  border: 2px solid var(--axiom-accent);
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
 }
 
 .square {
@@ -44,24 +49,26 @@
   justify-content: center;
   font-size: 0.8rem;
   color: rgba(0, 0, 0, 0.5);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color var(--duration-base) var(--ease-smooth),
+              box-shadow var(--duration-base) var(--ease-smooth);
   position: relative;
 }
 
 .square.light {
-  background-color: #f0d9b5;
+  background-color: var(--chess-light);
 }
 
 .square.dark {
-  background-color: #b58863;
+  background-color: var(--chess-dark);
 }
 
 .square.valid-move {
-  background-color: rgba(0, 255, 0, 0.3);
+  background-color: var(--chess-highlight);
+  box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.5);
 }
 
 .square:hover {
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 15px rgba(0, 212, 255, 0.4);
 }
 
 .piece {
@@ -73,8 +80,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s ease-out;
-  animation: slideIn 0.3s ease-out;
+  transition: opacity var(--duration-fast) var(--ease-smooth),
+              filter var(--duration-fast) var(--ease-smooth);
+  animation: slideIn var(--duration-base) var(--ease-smooth);
   cursor: grab;
   pointer-events: none;
 }
@@ -87,49 +95,60 @@
   cursor: grabbing;
 }
 
+.square[draggable="true"]:hover .piece {
+  filter: drop-shadow(0 0 8px var(--axiom-accent));
+}
+
 .white-piece {
   color: #ffffff;
-  text-shadow: 1px 1px 2px #000000;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+               0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 .black-piece {
   color: #000000;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .file-labels {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   width: 100%;
-  margin-top: 5px;
+  margin-top: var(--space-2);
 }
 
 .file-label {
   text-align: center;
-  font-weight: bold;
-  color: #333;
-  padding: 5px;
+  font-weight: 600;
+  color: var(--axiom-text-primary);
+  padding: var(--space-2);
+  font-size: 0.9rem;
 }
 
 .axiom-banner {
   text-align: center;
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 15px;
-  padding: 10px;
-  border-top: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+  color: var(--axiom-text-secondary);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-top: 1px solid var(--axiom-border);
   width: 100%;
 }
 
 .axiom-banner strong {
-  color: #2c5f9e;
+  color: var(--axiom-accent);
   font-weight: 600;
+  background: linear-gradient(135deg, var(--axiom-accent), var(--axiom-accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .chess-board {
     max-width: 90vw;
-    padding: 15px;
+    padding: var(--space-4);
   }
   .square {
     font-size: 0.6rem;
@@ -137,14 +156,24 @@
   .piece {
     font-size: 2em;
   }
+  .rank-label, .file-label {
+    font-size: 0.8rem;
+    padding: var(--space-1);
+  }
 }
 
 @media (max-width: 480px) {
   .chess-board {
     max-width: 95vw;
-    padding: 10px;
+    padding: var(--space-3);
   }
   .piece {
     font-size: 1.5em;
+  }
+  .rank-label, .file-label {
+    font-size: 0.7rem;
+  }
+  .axiom-banner {
+    font-size: 0.75rem;
   }
 }
