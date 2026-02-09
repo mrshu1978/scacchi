@@ -28,7 +28,8 @@ export class StockfishEngineService {
       // Create inline worker wrapper that loads Stockfish with correct locateFile
       const workerCode = `
         // Use full URL for importScripts (required for blob workers)
-        self.importScripts('${stockfishPath}stockfish-17.1-lite-51f59da.js');
+        // Using single-threaded version (no SharedArrayBuffer required for GitHub Pages)
+        self.importScripts('${stockfishPath}stockfish-nnue-17-single.js');
 
         console.log('[Stockfish Worker] Script loaded successfully');
 
