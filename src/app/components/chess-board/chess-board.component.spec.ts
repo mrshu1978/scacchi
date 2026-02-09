@@ -62,14 +62,14 @@ describe('ChessBoardComponent', () => {
   });
 
   it('should have correct square colors', () => {
-    // a8 (index 0) should be dark
-    expect(component.squares[0].color).toBe('dark');
-    // b8 (index 1) should be light
-    expect(component.squares[1].color).toBe('light');
-    // a1 (index 56) should be light
-    expect(component.squares[56].color).toBe('light');
-    // h1 (index 63) should be dark
-    expect(component.squares[63].color).toBe('dark');
+    // a8 (index 0): row=0, col=0 → (0+0)%2=0 → light
+    expect(component.squares[0].color).toBe('light');
+    // b8 (index 1): row=0, col=1 → (0+1)%2=1 → dark
+    expect(component.squares[1].color).toBe('dark');
+    // a1 (index 56): row=7, col=0 → (7+0)%2=1 → dark
+    expect(component.squares[56].color).toBe('dark');
+    // h1 (index 63): row=7, col=7 → (7+7)%2=0 → light
+    expect(component.squares[63].color).toBe('light');
   });
 
   it('should convert index to algebraic notation', () => {
