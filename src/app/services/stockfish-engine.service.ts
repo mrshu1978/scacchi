@@ -17,48 +17,13 @@ export class StockfishEngineService {
       // Get base href from HTML document
       const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
 
-      // Build FULL URL (not relative path) for importScripts
-      // Workers created from Blob require full http:// or https:// URLs for importScripts
-      const origin = window.location.origin;
-      const stockfishPath = `${origin}${baseHref}assets/stockfish/`;
+      // Use external worker file (not Blob) to avoid CORS issues with CDN in workers
+      const workerPath = `${baseHref}stockfish.worker.js`;
 
       console.log('[Stockfish] Base href:', baseHref);
-      console.log('[Stockfish] Stockfish path:', stockfishPath);
+      console.log('[Stockfish] Worker path:', workerPath);
 
-      // Use CDN-hosted Stockfish (no threading, works on GitHub Pages without CORS headers)
-      const stockfishCdnUrl = 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish.js';
-
-      const workerCode = `
-        // Use CDN-hosted single-threaded Stockfish (GitHub Pages compatible)
-        self.importScripts('${stockfishCdnUrl}');
-
-        console.log('[Stockfish Worker] CDN script loaded successfully');
-
-        if (typeof Stockfish === 'undefined') {
-          throw new Error('Stockfish global not found after importScripts');
-        }
-
-        const engine = Stockfish();
-
-        engine.addMessageListener(function(msg) {
-          self.postMessage(msg);
-        });
-
-        self.onmessage = function(e) {
-          if (e.data === 'quit') {
-            engine.postMessage('quit');
-          } else {
-            engine.postMessage(e.data);
-          }
-        };
-
-        console.log('[Stockfish Worker] Engine initialized successfully');
-      `;
-
-      const blob = new Blob([workerCode], { type: 'application/javascript' });
-      const workerUrl = URL.createObjectURL(blob);
-
-      this.worker = new Worker(workerUrl);
+      this.worker = new Worker(workerPath);
 
       this.worker.onmessage = (event: MessageEvent) => {
         console.log('[Stockfish] Message from worker:', event.data);
