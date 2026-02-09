@@ -7,7 +7,7 @@ describe('ChessBoardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ChessBoardComponent]
+      declarations: [ChessBoardComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChessBoardComponent);
