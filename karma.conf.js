@@ -30,8 +30,9 @@ module.exports = function (config) {
       ]
     },
     reporters: ['progress', 'kjhtml'],
-    browsers: ['Chrome'],
-    restartOnFileChange: true,
+    browsers: process.env.CI ? ['ChromeHeadless'] : ['Chrome'],
+    singleRun: process.env.CI ? true : false,
+    restartOnFileChange: !process.env.CI,
     customLaunchers: {
       ChromeHeadless: {
         base: 'Chrome',
