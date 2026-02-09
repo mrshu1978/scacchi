@@ -18,12 +18,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/stockfish.worker.js",
-              {
-                "glob": "**/*",
-                "input": "node_modules/stockfish/src",
-                "output": "/assets/stockfish"
-              }
+              "src/stockfish.worker.js"
             ],
             "styles": [
               "src/styles.css"
