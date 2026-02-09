@@ -15,7 +15,7 @@
 
 .rank-labels {
   display: grid;
-  grid-template-columns: 30px repeat(8, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   width: 100%;
   margin-bottom: 5px;
 }
@@ -94,7 +94,7 @@
 
 .file-labels {
   display: grid;
-  grid-template-columns: 30px repeat(8, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   width: 100%;
   margin-top: 5px;
 }
@@ -104,6 +104,21 @@
   font-weight: bold;
   color: #333;
   padding: 5px;
+}
+
+.axiom-banner {
+  text-align: center;
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 15px;
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.axiom-banner strong {
+  color: #2c5f9e;
+  font-weight: 600;
 }
 
 /* Responsive adjustments */
