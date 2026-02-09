@@ -14,51 +14,73 @@ export class StockfishEngineService {
 
   private initializeWorker(): void {
     try {
-      // Get base href for asset paths
+      // Get base href from HTML document
       const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
-      const stockfishDir = `${baseHref}assets/stockfish/`;
-      
+
+      // Build FULL URL (not relative path) for importScripts
+      // Workers created from Blob require full http:// or https:// URLs for importScripts
+      const origin = window.location.origin;
+      const stockfishPath = `${origin}${baseHref}assets/stockfish/`;
+
+      console.log('[Stockfish] Base href:', baseHref);
+      console.log('[Stockfish] Stockfish path:', stockfishPath);
+
       // Create inline worker wrapper that loads Stockfish with correct locateFile
       const workerCode = `
-        self.importScripts('${stockfishDir}stockfish-17.1-lite-51f59da.js');
-        
-        // Configure Stockfish to find WASM file
-        if (typeof Stockfish !== 'undefined') {
-          const engine = Stockfish({
-            locateFile: function(file) {
-              return '${stockfishDir}' + file;
-            }
-          });
-          
-          // Forward messages between Stockfish and main thread
-          engine.addMessageListener(function(msg) {
-            self.postMessage(msg);
-          });
-          
-          self.onmessage = function(e) {
-            engine.postMessage(e.data);
-          };
+        // Use full URL for importScripts (required for blob workers)
+        self.importScripts('${stockfishPath}stockfish-17.1-lite-51f59da.js');
+
+        console.log('[Stockfish Worker] Script loaded successfully');
+
+        if (typeof Stockfish === 'undefined') {
+          throw new Error('Stockfish global not found after importScripts');
         }
+
+        const engine = Stockfish({
+          locateFile: function(file) {
+            console.log('[Stockfish Worker] Locating file:', file);
+            return '${stockfishPath}' + file;
+          }
+        });
+
+        engine.addMessageListener(function(msg) {
+          self.postMessage(msg);
+        });
+
+        self.onmessage = function(e) {
+          if (e.data === 'quit') {
+            engine.postMessage('quit');
+          } else {
+            engine.postMessage(e.data);
+          }
+        };
+
+        console.log('[Stockfish Worker] Engine initialized successfully');
       `;
-      
+
       const blob = new Blob([workerCode], { type: 'application/javascript' });
       const workerUrl = URL.createObjectURL(blob);
-      
+
       this.worker = new Worker(workerUrl);
-      
+
       this.worker.onmessage = (event: MessageEvent) => {
+        console.log('[Stockfish] Message from worker:', event.data);
         this.messageSubject.next(event.data);
       };
 
       this.worker.onerror = (error: ErrorEvent) => {
-        console.error('Stockfish Worker error:', error);
-        console.error('Stockfish directory:', stockfishDir);
+        console.error('[Stockfish] Worker error:', error);
+        console.error('[Stockfish] Message:', error.message);
+        console.error('[Stockfish] Stockfish path was:', stockfishPath);
       };
+
+      console.log('[Stockfish] Worker initialized with URL:', workerUrl);
 
       // Initialize UCI protocol
       this.sendCommand('uci');
     } catch (error) {
-      console.error('Failed to initialize Stockfish Worker:', error);
+      console.error('[Stockfish] Failed to initialize worker:', error);
+      throw error;
     }
   }
 
