@@ -25,10 +25,11 @@
 
 .rank-label {
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--axiom-text-primary);
   padding: var(--space-2);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .board-grid {
@@ -119,10 +120,11 @@
 
 .file-label {
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--axiom-text-primary);
   padding: var(--space-2);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .axiom-banner {
@@ -157,7 +159,7 @@
     font-size: 2em;
   }
   .rank-label, .file-label {
-    font-size: 0.8rem;
+    font-size: 1rem;
     padding: var(--space-1);
   }
 }
@@ -171,7 +173,8 @@
     font-size: 1.5em;
   }
   .rank-label, .file-label {
-    font-size: 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 700;
   }
   .axiom-banner {
     font-size: 0.75rem;
