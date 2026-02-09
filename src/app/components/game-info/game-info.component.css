@@ -1,6 +1,6 @@
 /* Game info with glassmorphism and animations */
 .game-info {
-  padding: var(--space-6);
+  padding: var(--space-4) var(--space-6);
   background: var(--axiom-surface);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -11,6 +11,10 @@
   max-width: 700px;
   flex-shrink: 0;
   animation: slideIn var(--duration-slow) var(--ease-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
 }
 
 @media (max-width: 968px) {
@@ -22,17 +26,17 @@
 }
 
 h2 {
-  margin-top: 0;
-  margin-bottom: var(--space-4);
+  margin: 0;
   color: var(--axiom-text-primary);
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .turn-indicator {
-  margin-bottom: var(--space-6);
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1rem;
   font-weight: 600;
   display: inline-block;
   animation: pulse 2s ease-in-out infinite;
@@ -54,6 +58,10 @@ h2 {
   border-radius: 8px;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.move-history {
+  display: none;
 }
 
 .move-history h3 {
