@@ -25,28 +25,20 @@ export class StockfishEngineService {
       console.log('[Stockfish] Base href:', baseHref);
       console.log('[Stockfish] Stockfish path:', stockfishPath);
 
-      // Create inline worker wrapper that loads Stockfish with correct locateFile
+      // Use CDN-hosted Stockfish (no threading, works on GitHub Pages without CORS headers)
+      const stockfishCdnUrl = 'https://cdn.jsdelivr.net/npm/stockfish@16.0.0/src/stockfish.js';
+
       const workerCode = `
-        // Polyfill for SharedArrayBuffer (GitHub Pages compatibility)
-        if (typeof SharedArrayBuffer === 'undefined') {
-          self.SharedArrayBuffer = ArrayBuffer;
-        }
+        // Use CDN-hosted single-threaded Stockfish (GitHub Pages compatible)
+        self.importScripts('${stockfishCdnUrl}');
 
-        // Use full URL for importScripts (required for blob workers)
-        self.importScripts('${stockfishPath}stockfish-17.1-lite-51f59da.js');
-
-        console.log('[Stockfish Worker] Script loaded successfully');
+        console.log('[Stockfish Worker] CDN script loaded successfully');
 
         if (typeof Stockfish === 'undefined') {
           throw new Error('Stockfish global not found after importScripts');
         }
 
-        const engine = Stockfish({
-          locateFile: function(file) {
-            console.log('[Stockfish Worker] Locating file:', file);
-            return '${stockfishPath}' + file;
-          }
-        });
+        const engine = Stockfish();
 
         engine.addMessageListener(function(msg) {
           self.postMessage(msg);
