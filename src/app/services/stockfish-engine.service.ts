@@ -33,10 +33,10 @@ export class StockfishEngineService {
       this.worker.onerror = (error: ErrorEvent) => {
         console.error('[Stockfish] Worker error:', error);
         console.error('[Stockfish] Message:', error.message);
-        console.error('[Stockfish] Stockfish path was:', stockfishPath);
+        console.error('[Stockfish] Worker path was:', workerPath);
       };
 
-      console.log('[Stockfish] Worker initialized with URL:', workerUrl);
+      console.log('[Stockfish] Worker initialized with path:', workerPath);
 
       // Initialize UCI protocol
       this.sendCommand('uci');
