@@ -61,11 +61,14 @@ export class ChessGameService {
     const toRow = 8 - parseInt(to[1]);
     const toCol = to.charCodeAt(0) - 97;
     const piece = board[fromRow][fromCol];
-    
+
     if (piece) {
+      console.log(`Moving piece: ${piece} from ${from} to ${to}`);
+      console.log(`Is uppercase (white): ${piece === piece.toUpperCase()}`);
       const newBoard = board.map(row => [...row]);
       newBoard[fromRow][fromCol] = null;
       newBoard[toRow][toCol] = piece;
+      console.log(`Piece at destination: ${newBoard[toRow][toCol]}`);
       this.boardSubject.next(newBoard);
       
       const moveNotation = `${from}-${to}`;
